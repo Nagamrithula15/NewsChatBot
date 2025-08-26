@@ -1,10 +1,15 @@
 import nltk
-nltk.download("punkt")
 import streamlit as st
 import feedparser
 from sumy.parsers.plaintext import PlaintextParser
 from sumy.nlp.tokenizers import Tokenizer
 from sumy.summarizers.lsa import LsaSummarizer
+
+# Ensure 'punkt' tokenizer is available
+try:
+    nltk.data.find("tokenizers/punkt")
+except LookupError:
+    nltk.download("punkt")
 
 # RSS feed URLs
 RSS_FEEDS = {
@@ -28,7 +33,8 @@ def summarize_text(text, sentences_count=3):
     summary = summarizer(parser.document, sentences_count)
     return " ".join([str(sentence) for sentence in summary])
 
-# Streamlit App
+# Streamlit App UI
+st.set_page_config(page_title="News Summarizer Bot", page_icon="📰")
 st.title("📰 Free RSS News Summarizer Bot")
 st.write("Ask me about the latest news! (e.g., India, Tamil Nadu, Technology)")
 
@@ -45,12 +51,15 @@ if query := st.chat_input("Type your news topic (India/Tamil Nadu/Technology)...
     st.chat_message("user").write(query)
 
     # Select RSS feed
-    feed_url = RSS_FEEDS.get(query, RSS_FEEDS["India"])
+    feed_url = RSS_FEEDS.get(query.strip(), RSS_FEEDS["India"])
     news_articles = fetch_rss_news(feed_url)
 
     if news_articles:
         combined_text = " ".join(news_articles)
-        summary = summarize_text(combined_text, sentences_count=3)
+        try:
+            summary = summarize_text(combined_text, sentences_count=3)
+        except Exception as e:
+            summary = f"⚠️ Error during summarization: {str(e)}"
     else:
         summary = "Sorry, no recent news found for this topic."
 
