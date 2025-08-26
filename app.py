@@ -1,5 +1,6 @@
 import nltk
-nltk.download("punkt")
+nltk.data.path.append("./nltk_data")  # tells Python to use the folder in your project
+nltk.download("punkt", download_dir="./nltk_data")
 import streamlit as st
 import feedparser
 from sumy.parsers.plaintext import PlaintextParser
