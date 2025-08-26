@@ -1,3 +1,5 @@
+import nltk
+nltk.download("punkt")
 import streamlit as st
 import feedparser
 from sumy.parsers.plaintext import PlaintextParser
